@@ -17,7 +17,7 @@
  * Text Domain:       user-switching
  * Domain Path:       /languages/
  * Network:           true
- * Requires at least: 5.6
+ * Requires at least: 5.7
  * Requires PHP:      7.4
  * License URI:       https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
@@ -308,7 +308,7 @@ class user_switching {
 			$post_id = absint( $_GET['redirect_to_post'] );
 			$redirect_type = self::REDIRECT_TYPE_POST;
 
-			if ( function_exists( 'is_post_publicly_viewable' ) && is_post_publicly_viewable( $post_id ) ) {
+			if ( is_post_publicly_viewable( $post_id ) ) {
 				$link = get_permalink( $post_id );
 
 				if ( is_string( $link ) ) {
@@ -355,7 +355,7 @@ class user_switching {
 						$redirect_to = $link;
 						$requested_redirect_to = $link;
 					}
-				} elseif ( function_exists( 'is_post_publicly_viewable' ) && is_post_publicly_viewable( (int) $comment->comment_post_ID ) ) {
+				} elseif ( is_post_publicly_viewable( (int) $comment->comment_post_ID ) ) {
 					$link = get_permalink( (int) $comment->comment_post_ID );
 
 					if ( is_string( $link ) ) {
