@@ -3,7 +3,7 @@
 Stable tag: 1.7.3  
 Tested up to: 6.4  
 License: GPL v2 or later  
-Tags: users, user switching, fast user switching, multisite, woocommerce, buddypress, bbpress  
+Tags: users, user switching, fast user switching, multisite, woocommerce  
 Contributors: johnbillion  
 Donate link: https://github.com/sponsors/johnbillion
 
@@ -103,7 +103,7 @@ Yes, and you'll also be able to switch users from the Users screen in Network Ad
 
 ### Does this plugin work with WooCommerce?
 
-Yes, and you'll also be able to switch users from various WooCommerce administration screens.
+Yes, and you'll also be able to switch users from various WooCommerce administration screens while logged in as a Shop Manager or an administrative user.
 
 ### Does this plugin work with BuddyPress?
 
@@ -161,7 +161,10 @@ add_filter( 'user_has_cap', function( $allcaps, $caps, $args, $user ) {
 }, 9, 4 );
 ~~~
 
-Note that this needs to happen before User Switching's own capability filtering, hence the priority of `9`.
+Notes:
+
+* This needs to happen before User Switching's own capability filtering, hence the priority of `9`.
+* The ID of the target user can be found in `$args[2]`.
 
 ### Can I add a custom "Switch To" link to my own plugin or theme?
 
@@ -180,7 +183,28 @@ if ( method_exists( 'user_switching', 'maybe_switch_url' ) ) {
 }
 ~~~
 
-This link also works for switching back to the original user, but if you want an explicit link for this you can use the following code:
+If you want to specify the URL that the user gets redirected to after switching, add a `redirect_to` parameter to the URL like so:
+
+~~~php
+if ( method_exists( 'user_switching', 'maybe_switch_url' ) ) {
+	$url = user_switching::maybe_switch_url( $target_user );
+	if ( $url ) {
+		// Redirect to the home page after switching:
+		$redirect_to = home_url();
+		printf(
+			'<a href="%1$s">Switch to %2$s</a>',
+			esc_url( add_query_arg(
+				'redirect_to',
+				rawurlencode( $redirect_to ),
+				$url
+			) ),
+			esc_html( $target_user->display_name )
+		);
+	}
+}
+~~~
+
+The above code also works for displaying a link to switch back to the original user, but if you want an explicit link for this you can use the following code:
 
 ~~~php
 if ( method_exists( 'user_switching', 'get_old_user' ) ) {
@@ -217,9 +241,9 @@ You can install an audit trail plugin such as [Simple History](https://wordpress
 
 Potentially yes, but User Switching includes some safety protections for this and there are further precautions you can take as a site administrator:
 
+* You can install an audit trail plugin such as [Simple History](https://wordpress.org/plugins/simple-history/), [WP Activity Log](https://wordpress.org/plugins/wp-security-audit-log/), or [Stream](https://wordpress.org/plugins/stream/), all of which have built-in support for User Switching and all of which log an entry when a user switches into another account.
 * User Switching stores the ID of the originating user in the new WordPress user session for the user they switch to. Although this session does not persist by default when they subsequently switch back, there will be a record of this ID if your database server has query logging enabled.
 * User Switching stores the login name of the originating user in an authentication cookie (see the Privacy Statement for more information). If your server access logs store cookie data, there will be a record of this login name (along with the IP address) for each access request.
-* You can install an audit trail plugin such as [Simple History](https://wordpress.org/plugins/simple-history/), [WP Activity Log](https://wordpress.org/plugins/wp-security-audit-log/), or [Stream](https://wordpress.org/plugins/stream/), all of which have built-in support for User Switching and all of which log an entry when a user switches into another account.
 * User Switching triggers an action when a user switches account, switches off, or switches back (see below). You can use these actions to perform additional logging for safety purposes depending on your requirements.
 
 One or more of the above should allow you to correlate an action with the originating user when a user switches account, should you need to.
