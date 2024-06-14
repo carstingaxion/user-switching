@@ -25,6 +25,9 @@ on:
       - 'phpstan.neon.dist'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: PHP / PHP ${{ matrix.php }}
