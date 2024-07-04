@@ -29,6 +29,7 @@
 		<!-- Sanity: -->
 		<exclude name="Generic.Formatting.MultipleStatementAlignment.NotSameWarning" />
 		<exclude name="WordPress.Arrays.MultipleStatementAlignment.DoubleArrowNotAligned" />
+		<exclude name="Universal.Arrays.DisallowShortArraySyntax.Found" />
 	</rule>
 
 	<rule ref="WordPress-Docs" />
