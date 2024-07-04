@@ -11,12 +11,11 @@
 		"node": ">=18"
 	},
 	"devDependencies": {
-		"plugin-infrastructure": "file:vendor/johnbillion/plugin-infrastructure",
 		"version-bump-prompt": "^6.1.0"
 	},
 	"scripts": {
-		"bump:patch": "bump patch --commit 'Version %s.' user-switching.php package.json package-lock.json readme.md",
-		"bump:minor": "bump minor --commit 'Version %s.' user-switching.php package.json package-lock.json readme.md",
-		"bump:major": "bump major --commit 'Version %s.' user-switching.php package.json package-lock.json readme.md"
+		"bump:patch": "bump patch --commit 'Version %s.' user-switching.php package.json readme.md",
+		"bump:minor": "bump minor --commit 'Version %s.' user-switching.php package.json readme.md",
+		"bump:major": "bump major --commit 'Version %s.' user-switching.php package.json readme.md"
 	}
 }
