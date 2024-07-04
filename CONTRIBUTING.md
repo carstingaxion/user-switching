@@ -11,7 +11,7 @@ If you enjoy using User Switching I would greatly appreciate it <a href="https:/
 
 ## Reporting Security Issues
 
-You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage, and handle any security vulnerabilities. [Report a security vulnerability here](https://patchstack.com/database/vdp/user-switching).
+[You can report security bugs through the official User Switching Vulnerability Disclosure Program on Patchstack](https://patchstack.com/database/vdp/user-switching). The Patchstack team helps validate, triage, and handle any security vulnerabilities.
 
 Do not report security issues on GitHub or the WordPress.org support forums. Thank you.
 
