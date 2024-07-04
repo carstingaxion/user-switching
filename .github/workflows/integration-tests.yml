@@ -50,6 +50,9 @@ jobs:
           # Latest stable on PHP 8.3:
           - wp: '6.5'
             php: '8.3'
+          # Oldest supported WordPress
+          - wp: '5.7'
+            php: '7.4'
       fail-fast: false
     with:
       node: false
