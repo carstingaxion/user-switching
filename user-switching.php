@@ -293,7 +293,7 @@ class user_switching {
 	 * @param  WP_User $old_user Optional. The old user's WP_User object.
 	 * @return string The URL to redirect to.
 	 */
-	protected static function get_redirect( WP_User $new_user = null, WP_User $old_user = null ) {
+	protected static function get_redirect( ?WP_User $new_user = null, ?WP_User $old_user = null ) {
 		$redirect_to = '';
 		$requested_redirect_to = '';
 		$redirect_type = self::REDIRECT_TYPE_NONE;
