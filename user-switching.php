@@ -79,9 +79,16 @@ class user_switching {
 		add_action( 'wp_footer', [ $this, 'action_wp_footer' ] );
 		add_action( 'personal_options', [ $this, 'action_personal_options' ] );
 		add_action( 'admin_bar_menu', [ $this, 'action_admin_bar_menu' ], 11 );
+		add_action( 'shutdown', [ $this, 'action_shutdown_for_wp_die' ], 1, 0 );
+
+		// BuddyPress integration:
 		add_action( 'bp_member_header_actions', [ $this, 'action_bp_button' ], 11 );
 		add_action( 'bp_directory_members_actions', [ $this, 'action_bp_button' ], 11 );
+
+		// bbPress integration:
 		add_action( 'bbp_template_after_user_details_menu_items', [ $this, 'action_bbpress_button' ] );
+
+		// WooCommerce integration:
 		add_action( 'woocommerce_login_form_start', [ $this, 'action_woocommerce_login_form_start' ], 10, 0 );
 		add_action( 'woocommerce_admin_order_data_after_order_details', [ $this, 'action_woocommerce_order_details' ], 1 );
 		add_filter( 'woocommerce_account_menu_items', [ $this, 'filter_woocommerce_account_menu_items' ], 999 );
@@ -585,6 +592,46 @@ class user_switching {
 				] );
 			}
 		}
+	}
+
+	/**
+	 * Adds a 'Switch back to {user}' link to access denied messages within the admin area.
+	 *
+	 * Note that this doesn't appear for the "You need a higher level of permission" errors
+	 * because they use a standard `wp_die()` call rather than `admin_page_access_denied`.
+	 */
+	public function action_shutdown_for_wp_die(): void {
+		if ( ! did_action( 'admin_page_access_denied' ) ) {
+			return;
+		}
+
+		$old_user = self::get_old_user();
+
+		if ( ! ( $old_user instanceof WP_User ) ) {
+			return;
+		}
+
+		$url = add_query_arg( [
+			'redirect_to' => rawurlencode( self::current_url() ),
+		], self::switch_back_url( $old_user ) );
+
+		printf(
+			'<p style="%s" id="user_switching_wp_die"><a href="%s">%s</a></p>',
+			'border-top: 1px solid #dadada; margin-top: 3em; padding-top: 2em',
+			esc_url( $url ),
+			esc_html( self::switch_back_message( $old_user ) )
+		);
+
+		?>
+		<script>
+		// Move the switch back link so it's within the wp_die message container.
+		document.addEventListener( 'DOMContentLoaded', function() {
+			document.querySelector( '.wp-die-message' ).appendChild(
+				document.getElementById( 'user_switching_wp_die' )
+			);
+		} );
+		</script>
+		<?php
 	}
 
 	/**
