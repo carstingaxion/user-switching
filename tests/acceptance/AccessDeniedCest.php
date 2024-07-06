@@ -17,6 +17,7 @@ final class AccessDeniedCest {
 		$I->haveUserInDatabase( 'editor', 'editor' );
 		$I->switchToUser( 'editor' );
 		$I->amOnAdminPage( '/tools.php?page=foo' );
+		$I->seeInTitle( 'Error' );
 		$I->switchBackTo( 'admin' );
 		$I->seeCurrentUrlEquals( '/wp-admin/tools.php?page=foo&user_switched=true&switched_back=true' );
 	}
