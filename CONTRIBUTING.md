@@ -83,6 +83,7 @@ These are the steps to take to release a new version of User Switching (for cont
 1. `git tag x.y.z`
 1. `git push origin --tags`
 1. Enter the changelog into [the release on GitHub](https://github.com/johnbillion/user-switching/releases) and publish it.
+1. Approve the release on [the WordPress.org release management dashboard](https://wordpress.org/plugins/developers/releases/).
 
 ### Post Release
 
@@ -92,7 +93,6 @@ New milestones are automatically created for the next major, minor, and patch re
 
 1. Close the milestone.
 1. If this is a non-patch release, manually delete any [unused patch and minor milestones on GitHub](https://github.com/johnbillion/user-switching/milestones).
-1. Approve the release on [the WordPress.org release management dashboard](https://wordpress.org/plugins/developers/releases/).
 1. Check the new version has appeared [on the WordPress.org plugin page](https://wordpress.org/plugins/user-switching/).
 1. Resolve relevant threads on [the plugin's support forums](https://wordpress.org/support/plugin/user-switching/).
 
