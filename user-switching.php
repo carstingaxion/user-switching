@@ -13,7 +13,7 @@
  * Version:           1.8.0
  * Plugin URI:        https://wordpress.org/plugins/user-switching/
  * Author:            John Blackbourn
- * Author URI:        https://github.com/johnbillion/user-switching
+ * Author URI:        https://johnblackbourn.com
  * Text Domain:       user-switching
  * Domain Path:       /languages/
  * Network:           true
