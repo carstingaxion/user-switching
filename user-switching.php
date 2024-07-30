@@ -715,8 +715,10 @@ class user_switching {
 				'redirect_to' => rawurlencode( self::current_url() ),
 			], self::switch_back_url( $old_user ) );
 			printf(
-				'<p id="user_switching_switch_on" style="position:fixed;bottom:40px;padding:0;margin:0;left:10px;font-size:13px;z-index:99999;"><a href="%s">%s</a></p>',
+				'<p id="user_switching_switch_on" style="%s"><a href="%s" style="%s">%s</a></p>',
+				'position: fixed; bottom: 40px; padding: 0; margin: 0; left: 10px; font-size: 13px; z-index:99999;',
 				esc_url( $url ),
+				'padding: 8px 10px; background: #fff; color: #3858e9;',
 				esc_html( self::switch_back_message( $old_user ) )
 			);
 		}
