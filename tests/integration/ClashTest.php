@@ -10,27 +10,20 @@ final class ClashTest extends Test {
 	 * @covers \user_switching::detect_session_clash
 	 */
 	public function testSessionClashIsDetected(): void {
-		$admin1 = self::$testers['admin'];
-		$admin2 = self::factory()->user->create_and_get( array(
-			'role' => 'administrator',
-		) );
+		$admin = self::$testers['admin'];
 
-		// Set up the first admin session manager with a session
-		$admin1_manager = WP_Session_Tokens::get_instance( $admin1->ID );
-		$admin1_token = $admin1_manager->create( time() + DAY_IN_SECONDS );
+		// Set up the admin session manager with a session
+		$admin_manager = WP_Session_Tokens::get_instance( $admin->ID );
+		$admin_token = $admin_manager->create( time() + DAY_IN_SECONDS );
 
-		// Set up the second admin session manager with a session
-		$admin2_manager = WP_Session_Tokens::get_instance( $admin2->ID );
-		$admin2_token = $admin2_manager->create( time() + DAY_IN_SECONDS );
-
-		// Set up the first admin user state
-		wp_set_current_user( $admin1->ID );
-		wp_set_auth_cookie( $admin1->ID, false, '', $admin1_token );
+		// Set up the admin user state
+		wp_set_current_user( $admin->ID );
+		wp_set_auth_cookie( $admin->ID, false, '', $admin_token );
 
 		// Verify that there is no session clash
 		self::assertNull( user_switching::detect_session_clash( self::$users['author'] ) );
 
-		// Switch the first admin to author
+		// Switch the admin to author
 		switch_to_user( self::$users['author']->ID );
 
 		// Verify that the session clash is detected
@@ -39,8 +32,8 @@ final class ClashTest extends Test {
 		// Verify that no session clash is detected for another user
 		self::assertNull( user_switching::detect_session_clash( self::$users['editor'] ) );
 
-		// Switch the first admin back to their admin account
-		switch_to_user( $admin1->ID, false, false );
+		// Switch the admin back to their admin account
+		switch_to_user( $admin->ID, false, false );
 
 		// Verify that there is now no session clash
 		self::assertNull( user_switching::detect_session_clash( self::$users['author'] ) );
