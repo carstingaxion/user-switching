@@ -209,7 +209,7 @@ class user_switching {
 						// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 						do_action( 'qm/cease' );
 
-						$sentence = sprintf(
+						$message = sprintf(
 							/* Translators: 1: The name of the user who is currently switched to the target user, 2: The name of the target user, 3: Period of time (for example "5 minutes") */
 							__( '%1$s is currently switched to %2$s. They switched %3$s ago. Do you want to continue switching?', 'user-switching' ),
 							$clash['user']->display_name,
@@ -221,17 +221,17 @@ class user_switching {
 							__( 'Yes, switch to %s', 'user-switching' ),
 							$target->display_name,
 						);
-						$message = sprintf(
-							'%1$s<br><br><a class="button" href="%2$s">%3$s</a> &nbsp; <a class="button" href="%4$s">%5$s</a>',
-							esc_html( $sentence ),
-							esc_url( add_query_arg( 'force_switch_user', '1' ) ),
-							esc_html( $yes ),
-							'javascript:history.back()',
-							esc_html__( 'No, go back', 'user-switching' ),
-						);
+						$no = __( 'No, go back', 'user-switching' );
 
 						wp_die(
-							$message,
+							sprintf(
+								'%1$s<br><br><a class="button" href="%2$s">%3$s</a> &nbsp; <a class="button" href="%4$s">%5$s</a>',
+								esc_html( $message ),
+								esc_url( add_query_arg( 'force_switch_user', '1' ) ),
+								esc_html( $yes ),
+								'javascript:history.back()',
+								esc_html( $no ),
+							),
 							'',
 							[
 								'response' => 409,
