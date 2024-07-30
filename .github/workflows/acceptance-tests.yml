@@ -43,13 +43,13 @@ jobs:
           - '6.5'
           - '6.4'
         php:
-          # Most recent version of PHP supported by the above, plus 7.4
-          - '8.2'
+          # Most recent version of PHP supported by all of the above, plus 7.4
+          - '8.3'
           - '7.4'
         include:
-          # Latest WordPress on PHP 8.3
+          # Latest WordPress on PHP 8.4
           - wp: '6.6'
-            php: '8.3'
+            php: '8.4'
           # Oldest supported WordPress
           - wp: '5.8'
             php: '7.4'
