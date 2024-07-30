@@ -195,48 +195,54 @@ class user_switching {
 				// Check intent:
 				check_admin_referer( "switch_to_user_{$user_id}" );
 
+				$target = get_userdata( $user_id );
+
+				if ( ! $target ) {
+					wp_die( esc_html__( 'Could not switch users.', 'user-switching' ), 404 );
+				}
+
 				if ( ! isset( $_GET['force_switch_user'] ) ) {
-					$clash = $this->detect_session_clash( $user_id );
+					$clash = self::detect_session_clash( $target );
 
 					if ( $clash ) {
-							// Prevent Query Monitor from showing a stack trace for the wp_die() call:
-							// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
-							do_action( 'qm/cease' );
+						// Prevent Query Monitor from showing a stack trace for the wp_die() call:
+						// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+						do_action( 'qm/cease' );
 
-							$sentence = sprintf(
-								/* Translators: 1: The name of the user who is currently switched to the target user, 2: The name of the target user, 3: Period of time (for example "5 minutes") */
-								__( '%1$s is currently switched to %2$s. They switched %3$s ago. Do you want to continue switching?', 'user-switching' ),
-								$clash['switched_from_user']->display_name,
-								$clash['target']->display_name,
-								human_time_diff( $clash['session']['login'] ),
-							);
-							$yes = sprintf(
-								/* Translators: %s is the name of the target user */
-								__( 'Yes, switch to %s', 'user-switching' ),
-								$clash['target']->display_name,
-							);
-							$message = sprintf(
-								'%1$s<br><br><a class="button" href="%2$s">%3$s</a> &nbsp; <a class="button" href="%4$s">%5$s</a>',
-								esc_html( $sentence ),
-								esc_url( add_query_arg( 'force_switch_user', '1' ) ),
-								esc_html( $yes ),
-								'javascript:history.back()',
-								esc_html__( 'No, go back', 'user-switching' ),
-							);
+						$sentence = sprintf(
+							/* Translators: 1: The name of the user who is currently switched to the target user, 2: The name of the target user, 3: Period of time (for example "5 minutes") */
+							__( '%1$s is currently switched to %2$s. They switched %3$s ago. Do you want to continue switching?', 'user-switching' ),
+							$clash['user']->display_name,
+							$target->display_name,
+							human_time_diff( $clash['session']['login'] ),
+						);
+						$yes = sprintf(
+							/* Translators: %s is the name of the target user */
+							__( 'Yes, switch to %s', 'user-switching' ),
+							$target->display_name,
+						);
+						$message = sprintf(
+							'%1$s<br><br><a class="button" href="%2$s">%3$s</a> &nbsp; <a class="button" href="%4$s">%5$s</a>',
+							esc_html( $sentence ),
+							esc_url( add_query_arg( 'force_switch_user', '1' ) ),
+							esc_html( $yes ),
+							'javascript:history.back()',
+							esc_html__( 'No, go back', 'user-switching' ),
+						);
 
-							wp_die(
-								$message,
-								'',
-								[
-									'response' => 409,
-									'back_link' => false,
-								],
-							);
+						wp_die(
+							$message,
+							'',
+							[
+								'response' => 409,
+								'back_link' => false,
+							],
+						);
 					}
 				}
 
 				// Switch user:
-				$user = switch_to_user( $user_id, self::remember() );
+				$user = switch_to_user( $target->ID, self::remember() );
 				if ( $user ) {
 					$redirect_to = self::get_redirect( $user, $current_user );
 
@@ -336,26 +342,28 @@ class user_switching {
 	/**
 	 * Detects if the target user has any sessions that originated from another user.
 	 *
-	 * @param int $user_id Target user ID.
+	 * @param WP_User $target Target user.
 	 * @return array|null
 	 * @phpstan-return array{
 	 *   session: array{
 	 *     switched_from_id: int,
+	 *     expiration: int,
+	 *     ip: string,
+	 *     ua: string,
 	 *     login: int,
 	 *   },
-	 *   switched_from_user: WP_User,
-	 *   target: WP_User,
+	 *   user: WP_User,
 	 * }|null
 	 */
-	private function detect_session_clash( int $user_id ): ?array {
+	public static function detect_session_clash( WP_User $target ): ?array {
 		// Fetch the user sessions for the target user:
-		$sessions = WP_Session_Tokens::get_instance( $user_id );
+		$sessions = WP_Session_Tokens::get_instance( $target->ID );
 
 		// Determine if any of the target user's sessions originated from another user:
 		$other_user_sessions = array_filter(
 			$sessions->get_all(),
 			static fn ( array $session ): bool => (
-				isset( $session['switched_from_id'] ) && $session['switched_from_id'] !== $user_id
+				isset( $session['switched_from_id'] ) && $session['switched_from_id'] !== $target->ID
 			)
 		);
 
@@ -365,20 +373,14 @@ class user_switching {
 
 		$session = reset( $other_user_sessions );
 		$switched_from_user = get_userdata( $session['switched_from_id'] );
-		$target = get_userdata( $user_id );
 
 		if ( ! $switched_from_user ) {
 			return null;
 		}
 
-		if ( ! $target ) {
-			return null;
-		}
-
 		return [
 			'session' => $session,
-			'switched_from_user' => $switched_from_user,
-			'target' => $target,
+			'user' => $switched_from_user,
 		];
 	}
 
