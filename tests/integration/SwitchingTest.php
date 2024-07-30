@@ -38,11 +38,7 @@ final class SwitchingTest extends Test {
 	 * @covers \switch_to_user
 	 */
 	public function testSwitchUserAndBack(): void {
-		if ( is_multisite() ) {
-			$admin = self::$testers['super'];
-		} else {
-			$admin = self::$testers['admin'];
-		}
+		$admin = self::$testers['admin'];
 
 		wp_set_current_user( $admin->ID );
 
@@ -143,11 +139,7 @@ final class SwitchingTest extends Test {
 	 * @covers \switch_off_user
 	 */
 	public function testSwitchOffAndBack(): void {
-		if ( is_multisite() ) {
-			$admin = self::$testers['super'];
-		} else {
-			$admin = self::$testers['admin'];
-		}
+		$admin = self::$testers['admin'];
 
 		wp_set_current_user( $admin->ID );
 
