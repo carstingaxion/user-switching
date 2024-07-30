@@ -23,12 +23,12 @@ final class ClashTest extends Test {
 		$admin2_manager = WP_Session_Tokens::get_instance( $admin2->ID );
 		$admin2_token = $admin2_manager->create( time() + DAY_IN_SECONDS );
 
-		// Verify that there is no session clash
-		self::assertNull( user_switching::detect_session_clash( self::$users['author'] ) );
-
 		// Set up the first admin user state
 		wp_set_current_user( $admin1->ID );
 		wp_set_auth_cookie( $admin1->ID, false, '', $admin1_token );
+
+		// Verify that there is no session clash
+		self::assertNull( user_switching::detect_session_clash( self::$users['author'] ) );
 
 		// Switch the first admin to author
 		switch_to_user( self::$users['author']->ID );
