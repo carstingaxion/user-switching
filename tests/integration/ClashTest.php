@@ -33,14 +33,16 @@ final class ClashTest extends Test {
 		// Switch the first admin to author
 		switch_to_user( self::$users['author']->ID );
 
-		// Set up the second admin user state
-		wp_set_current_user( $admin2->ID );
-		wp_set_auth_cookie( $admin2->ID, false, '', $admin2_token );
-
 		// Verify that the session clash is detected
 		self::assertIsArray( user_switching::detect_session_clash( self::$users['author'] ) );
 
 		// Verify that no session clash is detected for another user
 		self::assertNull( user_switching::detect_session_clash( self::$users['editor'] ) );
+
+		// Switch the first admin back to their admin account
+		switch_to_user( $admin1->ID, false, false );
+
+		// Verify that there is now no session clash
+		self::assertNull( user_switching::detect_session_clash( self::$users['author'] ) );
 	}
 }
