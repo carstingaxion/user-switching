@@ -39,5 +39,8 @@ final class ClashTest extends Test {
 
 		// Verify that the session clash is detected
 		self::assertIsArray( user_switching::detect_session_clash( self::$users['author'] ) );
+
+		// Verify that no session clash is detected for another user
+		self::assertNull( user_switching::detect_session_clash( self::$users['editor'] ) );
 	}
 }
