@@ -195,6 +195,61 @@ class user_switching {
 				// Check intent:
 				check_admin_referer( "switch_to_user_{$user_id}" );
 
+				if ( ! isset( $_GET['force_switch_user'] ) ) {
+					// Fetch the user sessions for the target user:
+					$sessions = WP_Session_Tokens::get_instance( $user_id );
+
+					// Determine if any of the target user's sessions originated from another user:
+					$other_user_sessions = array_filter(
+						$sessions->get_all(),
+						static fn ( array $session ): bool => (
+							isset( $session['switched_from_id'] ) && $session['switched_from_id'] !== $user_id
+						)
+					);
+
+					if ( ! empty( $other_user_sessions ) ) {
+						$session = reset( $other_user_sessions );
+						$switched_from_user = get_userdata( $session['switched_from_id'] );
+						$target = get_userdata( $user_id );
+
+						if ( $switched_from_user && $target ) {
+							// Prevent Query Monitor from showing a stack trace for the wp_die() call:
+							// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+							do_action( 'qm/cease' );
+
+							$sentence = sprintf(
+								/* Translators: 1: The name of the user who is currently switched to the target user, 2: The name of the target user, 3: Period of time (for example "5 minutes") */
+								__( '%1$s is currently switched to %2$s. They switched %3$s ago. Do you want to continue switching?', 'user-switching' ),
+								$switched_from_user->display_name,
+								$target->display_name,
+								human_time_diff( $session['login'] ),
+							);
+							$yes = sprintf(
+								/* Translators: %s is the name of the target user */
+								__( 'Yes, switch to %s', 'user-switching' ),
+								$target->display_name,
+							);
+							$message = sprintf(
+								'%1$s<br><br><a class="button" href="%2$s">%3$s</a> &nbsp; <a class="button" href="%4$s">%5$s</a>',
+								esc_html( $sentence ),
+								esc_url( add_query_arg( 'force_switch_user', '1' ) ),
+								esc_html( $yes ),
+								'javascript:history.back()',
+								esc_html__( 'No, go back', 'user-switching' ),
+							);
+
+							wp_die(
+								$message,
+								'',
+								[
+									'response' => 409,
+									'back_link' => false,
+								],
+							);
+						}
+					}
+				}
+
 				// Switch user:
 				$user = switch_to_user( $user_id, self::remember() );
 				if ( $user ) {
