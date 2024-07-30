@@ -214,7 +214,7 @@ class user_switching {
 							__( '%1$s is currently switched to %2$s. They switched %3$s ago. Do you want to continue switching?', 'user-switching' ),
 							$clash['user']->display_name,
 							$target->display_name,
-							human_time_diff( $clash['session']['login'] ),
+							human_time_diff( $clash['login'] ),
 						);
 						$yes = sprintf(
 							/* Translators: %s is the name of the target user */
@@ -345,13 +345,7 @@ class user_switching {
 	 * @param WP_User $target Target user.
 	 * @return array|null
 	 * @phpstan-return array{
-	 *   session: array{
-	 *     switched_from_id: int,
-	 *     expiration: int,
-	 *     ip: string,
-	 *     ua: string,
-	 *     login: int,
-	 *   },
+	 *   login: int,
 	 *   user: WP_User,
 	 * }|null
 	 */
@@ -379,7 +373,7 @@ class user_switching {
 		}
 
 		return [
-			'session' => $session,
+			'login' => $session['login'],
 			'user' => $switched_from_user,
 		];
 	}
