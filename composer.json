@@ -13,7 +13,8 @@
 	"support": {
 		"issues": "https://github.com/johnbillion/user-switching/issues",
 		"forum": "https://wordpress.org/support/plugin/user-switching",
-		"source": "https://github.com/johnbillion/user-switching"
+		"source": "https://github.com/johnbillion/user-switching",
+		"security": "https://patchstack.com/database/vdp/user-switching"
 	},
 	"funding": [
 		{
