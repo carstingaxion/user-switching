@@ -2,6 +2,7 @@ includes:
 	- vendor/phpstan/phpstan-phpunit/extension.neon
 	- vendor/szepeviktor/phpstan-wordpress/extension.neon
 	- vendor/johnbillion/plugin-infrastructure/phpstan/extension.neon
+	- vendor/johnbillion/wp-compat/extension.neon
 parameters:
 	level: 9
 	paths:
@@ -22,3 +23,5 @@ parameters:
 			message: '#^Unreachable statement#'
 			path: user-switching.php
 			count: 3
+	WPCompat:
+		requiresAtLeast: '5.8'

@@ -38,7 +38,9 @@ final class PluginTest extends Test {
 
 			$file_contents = implode( '', $file_array );
 
-			preg_match( '|Stable tag:(.*)|i', $file_contents, $_stable_tag );
+			if ( preg_match( '|Stable tag:(.*)|i', $file_contents, $_stable_tag ) !== 1 ) {
+				return null;
+			}
 
 			$this->readme_data = array(
 				'stable_tag' => trim( trim( $_stable_tag[1], '*' ) )

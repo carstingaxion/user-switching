@@ -31,9 +31,10 @@
 		"codeception/module-webdriver": "^1.0",
 		"codeception/util-universalframework": "^1.0",
 		"johnbillion/plugin-infrastructure": "dev-trunk",
+		"johnbillion/wp-compat": "0.1.0",
 		"lucatume/wp-browser": "3.2.3",
 		"phpcompatibility/phpcompatibility-wp": "2.1.5",
-		"phpstan/phpstan": "1.11.8",
+		"phpstan/phpstan": "1.12.2",
 		"phpstan/phpstan-phpunit": "1.4.0",
 		"roots/wordpress-core-installer": "1.100.0",
 		"roots/wordpress-full": "*",
@@ -83,7 +84,7 @@
 		],
 		"test:phpstan": [
 			"codecept build",
-			"phpstan analyze --memory-limit=1024M"
+			"phpstan analyze -v --memory-limit=1024M"
 		],
 		"test:start": [
 			"tests-start"
