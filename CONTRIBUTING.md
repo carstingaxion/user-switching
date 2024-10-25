@@ -19,7 +19,7 @@ Do not report security issues on GitHub or the WordPress.org support forums. Tha
 
 Contributions to User Switching are welcome from anyone. Whether you are new to Open Source or a seasoned veteran, all constructive contribution is welcome and I'll endeavour to support you when I can.
 
-This project is released with <a href="https://github.com/johnbillion/user-switching/blob/develop/CODE_OF_CONDUCT.md">a contributor code of conduct</a> and by participating in this project you agree to abide by its terms. The code of conduct is nothing to worry about, if you are a respectful human being then all will be good.
+This project is released with <a href="CODE_OF_CONDUCT.md">a contributor code of conduct</a> and by participating in this project you agree to abide by its terms. The code of conduct is nothing to worry about, if you are a respectful human being then all will be good.
 
 ## Setting up Locally
 
