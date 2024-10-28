@@ -23,5 +23,3 @@ parameters:
 			message: '#^Unreachable statement#'
 			path: user-switching.php
 			count: 3
-	WPCompat:
-		requiresAtLeast: '5.8'
