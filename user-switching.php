@@ -234,7 +234,8 @@ class user_switching {
 				if ( switch_to_user( $old_user->ID, self::remember(), false ) ) {
 
 					if ( ! empty( $_REQUEST['interim-login'] ) && function_exists( 'login_header' ) ) {
-						$GLOBALS['interim_login'] = 'success'; // @codingStandardsIgnoreLine
+						// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+						$GLOBALS['interim_login'] = 'success';
 						login_header( '', '' );
 						exit;
 					}
@@ -292,8 +293,8 @@ class user_switching {
 	/**
 	 * Fetches the URL to redirect to for a given user (used after switching).
 	 *
-	 * @param  WP_User $new_user Optional. The new user's WP_User object.
-	 * @param  WP_User $old_user Optional. The old user's WP_User object.
+	 * @param WP_User $new_user Optional. The new user's WP_User object.
+	 * @param WP_User $old_user Optional. The old user's WP_User object.
 	 * @return string The URL to redirect to.
 	 */
 	protected static function get_redirect( ?WP_User $new_user = null, ?WP_User $old_user = null ) {
@@ -1359,8 +1360,8 @@ if ( ! function_exists( 'user_switching_clear_olduser_cookie' ) ) {
 			}
 
 			$expire = time() - 31536000;
-			setcookie( USER_SWITCHING_COOKIE,         ' ', $expire, SITECOOKIEPATH, COOKIE_DOMAIN );
-			setcookie( USER_SWITCHING_SECURE_COOKIE,  ' ', $expire, SITECOOKIEPATH, COOKIE_DOMAIN );
+			setcookie( USER_SWITCHING_COOKIE, ' ', $expire, SITECOOKIEPATH, COOKIE_DOMAIN );
+			setcookie( USER_SWITCHING_SECURE_COOKIE, ' ', $expire, SITECOOKIEPATH, COOKIE_DOMAIN );
 			setcookie( USER_SWITCHING_OLDUSER_COOKIE, ' ', $expire, COOKIEPATH, COOKIE_DOMAIN );
 		} else {
 			if ( user_switching::secure_auth_cookie() ) {
@@ -1459,7 +1460,7 @@ if ( ! function_exists( 'switch_to_user' ) ) {
 		 * @param array<string, mixed> $session Array of extra data.
 		 * @return array<string, mixed> Array of extra data.
 		 */
-		$session_filter = function ( array $session ) use ( $old_user_id, $old_token ) {
+		$session_filter = static function ( array $session ) use ( $old_user_id, $old_token ): array {
 			$session['switched_from_id'] = $old_user_id;
 			$session['switched_from_session'] = $old_token;
 			return $session;
