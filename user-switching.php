@@ -15,7 +15,7 @@
  * Author:            John Blackbourn
  * Author URI:        https://johnblackbourn.com
  * Network:           true
- * Requires at least: 5.8
+ * Requires at least: 5.9
  * Requires PHP:      7.4
  * License URI:       https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
