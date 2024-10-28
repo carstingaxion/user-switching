@@ -201,44 +201,42 @@ class user_switching {
 					wp_die( esc_html__( 'Could not switch users.', 'user-switching' ), 404 );
 				}
 
-				if ( ! isset( $_GET['force_switch_user'] ) ) {
-					$clash = self::detect_session_clash( $target );
+				$clash = self::detect_session_clash( $target );
 
-					if ( $clash ) {
-						// Prevent Query Monitor from showing a stack trace for the wp_die() call:
-						// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
-						do_action( 'qm/cease' );
+				if ( $clash && ! isset( $_GET['force_switch_user'] ) ) {
+					// Prevent Query Monitor from showing a stack trace for the wp_die() call:
+					// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
+					do_action( 'qm/cease' );
 
-						$message = sprintf(
-							/* Translators: 1: The name of the user who is currently switched to the target user, 2: The name of the target user, 3: Period of time (for example "5 minutes") */
-							__( '%1$s is currently switched to %2$s. They switched %3$s ago. Do you want to continue switching?', 'user-switching' ),
-							$clash['user']->display_name,
-							$target->display_name,
-							human_time_diff( $clash['login'] ),
-						);
-						$yes = sprintf(
-							/* Translators: %s is the name of the target user */
-							__( 'Yes, switch to %s', 'user-switching' ),
-							$target->display_name,
-						);
-						$no = __( 'No, go back', 'user-switching' );
+					$message = sprintf(
+						/* Translators: 1: The name of the user who is currently switched to the target user, 2: The name of the target user, 3: Period of time (for example "5 minutes") */
+						__( '%1$s is currently switched to %2$s. They switched %3$s ago. Do you want to continue switching?', 'user-switching' ),
+						$clash['user']->display_name,
+						$target->display_name,
+						human_time_diff( $clash['login'] ),
+					);
+					$yes = sprintf(
+						/* Translators: %s is the name of the target user */
+						__( 'Yes, switch to %s', 'user-switching' ),
+						$target->display_name,
+					);
+					$no = __( 'No, go back', 'user-switching' );
 
-						wp_die(
-							sprintf(
-								'%1$s<br><br><a class="button" href="%2$s">%3$s</a> &nbsp; <a class="button" href="%4$s">%5$s</a>',
-								esc_html( $message ),
-								esc_url( add_query_arg( 'force_switch_user', '1' ) ),
-								esc_html( $yes ),
-								'javascript:history.back()',
-								esc_html( $no ),
-							),
-							'',
-							[
-								'response' => 409,
-								'back_link' => false,
-							],
-						);
-					}
+					wp_die(
+						sprintf(
+							'%1$s<br><br><a class="button" href="%2$s">%3$s</a> &nbsp; <a class="button" href="%4$s">%5$s</a>',
+							esc_html( $message ),
+							esc_url( add_query_arg( 'force_switch_user', '1' ) ),
+							esc_html( $yes ),
+							'javascript:history.back()',
+							esc_html( $no ),
+						),
+						'',
+						[
+							'response' => 409,
+							'back_link' => false,
+						],
+					);
 				}
 
 				// Switch user:
