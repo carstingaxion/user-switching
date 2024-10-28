@@ -250,6 +250,12 @@ One or more of the above should allow you to correlate an action with the origin
 
 Bear in mind that even without the User Switching plugin in use, any user who has the ability to edit another user can still frame another user for an action by, for example, changing their password and manually logging into that account. If you are concerned about users abusing others, you should take great care when granting users administrative rights.
 
+### Does this plugin warn me if I attempt to switch into an account which somebody else is already switched into?
+
+Yes. When this happens you'll be shown a prompt asking you to confirm that you would like to continue switching to the affected account.
+
+This feature is useful if you have multiple users on your site who may be switching into other user accounts at the same time, for example a team of support agents.
+
 ### Can I switch users directly from the admin toolbar?
 
 Yes, there's a third party add-on plugin for this: [Admin Bar User Switching](https://wordpress.org/plugins/admin-bar-user-switching/).
