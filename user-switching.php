@@ -42,6 +42,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 final class user_switching {
 	/**
 	 * The name used to identify the application during a WordPress redirect.
+	 *
+	 * @var string
 	 */
 	public static string $application = 'WordPress/User Switching';
 
