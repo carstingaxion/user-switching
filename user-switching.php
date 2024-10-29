@@ -14,6 +14,8 @@
  * Plugin URI:        https://wordpress.org/plugins/user-switching/
  * Author:            John Blackbourn
  * Author URI:        https://johnblackbourn.com
+ * Text Domain:       user-switching
+ * Domain Path:       /languages/
  * Network:           true
  * Requires at least: 5.9
  * Requires PHP:      7.4
@@ -161,9 +163,11 @@ final class user_switching {
 	}
 
 	/**
-	 * Routes actions depending on the 'action' query var.
+	 * Loads localisation files and routes actions depending on the 'action' query var.
 	 */
 	public function action_init(): void {
+		load_plugin_textdomain( 'user-switching', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
 		if ( ! isset( $_REQUEST['action'] ) ) {
 			return;
 		}
