@@ -66,7 +66,7 @@ These are the steps to take to release a new version of User Switching (for cont
 1. Check [the milestone on GitHub](https://github.com/johnbillion/user-switching/milestones) for open issues or PRs. Fix or reassign as necessary.
 1. If this is a non-patch release, check issues and PRs assigned to the patch or minor milestones that will get skipped. Reassign as necessary.
 1. Ensure you're on the `develop` branch and all the changes for this release have been merged in.
-1. Ensure `phpstan.neon.dist` and `readme.md` contain up to date "Tested up to" versions, descriptions, FAQs, screenshots, etc.
+1. Ensure `readme.md` contains up to date "Tested up to" versions, descriptions, FAQs, screenshots, etc.
 1. Ensure `.gitattributes` is up to date with all files that shouldn't be part of the build.
    - To do this, run `git archive --output=user-switching.zip HEAD` then check the contents for files that shouldn't be part of the package.
 1. Run `composer test` and ensure everything passes.
