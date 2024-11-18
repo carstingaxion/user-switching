@@ -49,4 +49,3 @@ jobs:
         with:
           version: ${{ needs.deploy.outputs.version }}
           zip-path: ${{ needs.deploy.outputs.zip-path }}
-          dry-run: ${{ github.event_name == 'workflow_dispatch' }}
