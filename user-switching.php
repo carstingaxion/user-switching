@@ -172,8 +172,6 @@ final class user_switching {
 			return;
 		}
 
-		$current_user = ( is_user_logged_in() ) ? wp_get_current_user() : null;
-
 		switch ( $_REQUEST['action'] ) {
 
 			// We're attempting to switch to another user:
@@ -188,13 +186,14 @@ final class user_switching {
 				// Check intent:
 				check_admin_referer( "switch_to_user_{$user_id}" );
 
+				$current_user = wp_get_current_user();
 				$target = get_userdata( $user_id );
 
 				if ( ! $target ) {
 					wp_die( esc_html__( 'Could not switch users.', 'user-switching' ), 404 );
 				}
 
-				$clash = self::detect_session_clash( $target );
+				$clash = self::detect_session_clash( $target, $current_user );
 
 				if ( $clash && ! isset( $_GET['force_switch_user'] ) ) {
 					// Prevent Query Monitor from showing a stack trace for the wp_die() call:
@@ -271,6 +270,8 @@ final class user_switching {
 				// Check intent:
 				check_admin_referer( "switch_to_olduser_{$old_user->ID}" );
 
+				$current_user = wp_get_current_user();
+
 				// Switch user:
 				if ( switch_to_user( $old_user->ID, self::remember(), false ) ) {
 
@@ -306,6 +307,8 @@ final class user_switching {
 					wp_die( esc_html__( 'Could not switch off.', 'user-switching' ), 403 );
 				}
 
+				$current_user = wp_get_current_user();
+
 				// Check intent:
 				check_admin_referer( 'switch_off' );
 
@@ -335,13 +338,14 @@ final class user_switching {
 	 * Detects if the target user has any sessions that originated from another user.
 	 *
 	 * @param WP_User $target Target user.
+	 * @param WP_User $ignore User to ignore when checking for clashing sessions.
 	 * @return array|null
 	 * @phpstan-return array{
 	 *   login: int,
 	 *   user: WP_User,
 	 * }|null
 	 */
-	public static function detect_session_clash( WP_User $target ): ?array {
+	public static function detect_session_clash( WP_User $target, WP_User $ignore ): ?array {
 		// Fetch the user sessions for the target user:
 		$sessions = WP_Session_Tokens::get_instance( $target->ID );
 
@@ -349,7 +353,7 @@ final class user_switching {
 		$other_user_sessions = array_filter(
 			$sessions->get_all(),
 			static fn ( array $session ): bool => (
-				isset( $session['switched_from_id'] ) && $session['switched_from_id'] !== $target->ID
+				isset( $session['switched_from_id'] ) && $session['switched_from_id'] !== $ignore->ID
 			)
 		);
 
