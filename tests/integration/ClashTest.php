@@ -7,7 +7,7 @@ use WP_Session_Tokens;
 
 final class ClashTest extends Test {
 	/**
-	 * @covers \user_switching::detect_session_clash
+	 * @covers \user_switching::get_duplicated_switch
 	 */
 	public function testSessionClashIsDetected(): void {
 		$admin = self::$testers['admin'];
@@ -22,31 +22,31 @@ final class ClashTest extends Test {
 		wp_set_auth_cookie( $admin->ID, false, '', $admin_token );
 
 		// Verify that there is initially no session clash
-		self::assertNull( user_switching::detect_session_clash( self::$users['author'], $admin ) );
+		self::assertNull( user_switching::get_duplicated_switch( self::$users['author'], $admin ) );
 
 		// Switch the admin to author
 		switch_to_user( self::$users['author']->ID );
 
 		// Verify that a session clash is detected if another user were to attempt to switch to the author
-		self::assertIsArray( user_switching::detect_session_clash( self::$users['author'], $another ) );
+		self::assertIsArray( user_switching::get_duplicated_switch( self::$users['author'], $another ) );
 
 		// Verify that no session clash is detected for the user who just made the switch (this allows a user to switch into the same user multiple times)
-		self::assertNull( user_switching::detect_session_clash( self::$users['author'], $admin ) );
+		self::assertNull( user_switching::get_duplicated_switch( self::$users['author'], $admin ) );
 
 		// Verify that no session clash is detected for a target user who nobody has switched into
-		self::assertNull( user_switching::detect_session_clash( self::$users['editor'], $another ) );
-		self::assertNull( user_switching::detect_session_clash( self::$users['editor'], $admin ) );
+		self::assertNull( user_switching::get_duplicated_switch( self::$users['editor'], $another ) );
+		self::assertNull( user_switching::get_duplicated_switch( self::$users['editor'], $admin ) );
 
 		// Switch the admin back to their admin account
 		switch_to_user( $admin->ID, false, false );
 
 		// Verify that there are now no session clashes
-		self::assertNull( user_switching::detect_session_clash( self::$users['author'], $another ) );
-		self::assertNull( user_switching::detect_session_clash( self::$users['author'], $admin ) );
+		self::assertNull( user_switching::get_duplicated_switch( self::$users['author'], $another ) );
+		self::assertNull( user_switching::get_duplicated_switch( self::$users['author'], $admin ) );
 	}
 
 	/**
-	 * @covers \user_switching::detect_session_clash
+	 * @covers \user_switching::get_duplicated_switch
 	 */
 	public function testSessionClashByCurrentUserIsIgnored(): void {
 		$admin = self::$testers['admin'];
@@ -69,6 +69,6 @@ final class ClashTest extends Test {
 		wp_set_auth_cookie( $admin->ID, false, '', $admin_token_2 );
 
 		// Verify that there is no session clash because the clash is from the same user
-		self::assertNull( user_switching::detect_session_clash( self::$users['author'], $admin ) );
+		self::assertNull( user_switching::get_duplicated_switch( self::$users['author'], $admin ) );
 	}
 }

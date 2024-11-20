@@ -193,9 +193,9 @@ final class user_switching {
 					wp_die( esc_html__( 'Could not switch users.', 'user-switching' ), 404 );
 				}
 
-				$clash = self::detect_session_clash( $target, $current_user );
+				$duplicate = self::get_duplicated_switch( $target, $current_user );
 
-				if ( $clash && ! isset( $_GET['force_switch_user'] ) ) {
+				if ( $duplicate && ! isset( $_GET['force_switch_user'] ) ) {
 					// Prevent Query Monitor from showing a stack trace for the wp_die() call:
 					// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 					do_action( 'qm/cease' );
@@ -203,9 +203,9 @@ final class user_switching {
 					$message = sprintf(
 						/* Translators: 1: The name of the user who is currently switched to the target user, 2: The name of the target user, 3: Period of time (for example "5 minutes") */
 						__( '%1$s is currently switched to %2$s. They switched %3$s ago. Do you want to continue switching?', 'user-switching' ),
-						$clash['user']->display_name,
+						$duplicate['user']->display_name,
 						$target->display_name,
-						human_time_diff( $clash['login'] ),
+						human_time_diff( $duplicate['login'] ),
 					);
 					$yes = sprintf(
 						/* Translators: %s is the name of the target user */
@@ -335,17 +335,24 @@ final class user_switching {
 	}
 
 	/**
-	 * Detects if the target user has any sessions that originated from another user.
+	 * Detects if the target user has any sessions that originated from another user switching into their account.
+	 *
+	 * Returns information about the first such session, if any.
 	 *
 	 * @param WP_User $target Target user.
-	 * @param WP_User $ignore User to ignore when checking for clashing sessions.
-	 * @return array|null
+	 * @param WP_User $ignore User to ignore when checking for duplicate switches.
+	 * @return array|null {
+	 *     Information about the duplicate, or null if there is none.
+	 *
+	 *     @type int     $login The login time of the session that originated from another user.
+	 *     @type WP_User $user  The user who switched into the target user's account.
+	 * }
 	 * @phpstan-return array{
 	 *   login: int,
 	 *   user: WP_User,
 	 * }|null
 	 */
-	public static function detect_session_clash( WP_User $target, WP_User $ignore ): ?array {
+	public static function get_duplicated_switch( WP_User $target, WP_User $ignore ): ?array {
 		// Fetch the user sessions for the target user:
 		$sessions = WP_Session_Tokens::get_instance( $target->ID );
 
