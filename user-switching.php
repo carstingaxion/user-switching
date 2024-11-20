@@ -301,13 +301,13 @@ final class user_switching {
 			// We're attempting to switch off the current user:
 			case 'switch_off':
 				// Check authentication:
-				if ( ! $current_user || ! current_user_can( 'switch_off' ) ) {
+				if ( ! current_user_can( 'switch_off' ) ) {
 					/* Translators: "switch off" means to temporarily log out */
 					wp_die( esc_html__( 'Could not switch off.', 'user-switching' ), 403 );
 				}
 
 				// Check intent:
-				check_admin_referer( "switch_off_{$current_user->ID}" );
+				check_admin_referer( 'switch_off' );
 
 				// Switch off:
 				if ( switch_off_user() ) {
@@ -627,7 +627,7 @@ final class user_switching {
 		}
 
 		if ( current_user_can( 'switch_off' ) ) {
-			$url = self::switch_off_url( wp_get_current_user() );
+			$url = self::switch_off_url();
 			$redirect_to = is_admin() ? self::get_admin_redirect_to() : [
 				'redirect_to' => rawurlencode( self::current_url() ),
 			];
@@ -1011,14 +1011,15 @@ final class user_switching {
 	/**
 	 * Returns the nonce-secured URL needed to switch off the current user.
 	 *
-	 * @param  WP_User $user The user to be switched off.
-	 * @return string        The required URL.
+	 * @since 1.9.0 The `$user` parameter has been removed as it's no longer needed.
+	 *
+	 * @return string The required URL.
 	 */
-	public static function switch_off_url( WP_User $user ): string {
+	public static function switch_off_url(): string {
 		return wp_nonce_url( add_query_arg( [
 			'action' => 'switch_off',
 			'nr' => 1,
-		], wp_login_url() ), "switch_off_{$user->ID}" );
+		], wp_login_url() ), 'switch_off' );
 	}
 
 	/**
