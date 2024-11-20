@@ -966,7 +966,7 @@ final class user_switching {
 	/**
 	 * Returns the switch to or switch back URL for a given user.
 	 *
-	 * @param  WP_User $user The user to be switched to.
+	 * @param WP_User $user The user to be switched to.
 	 * @return string|false The required URL, or false if there's no old user or the user doesn't have the required capability.
 	 */
 	public static function maybe_switch_url( WP_User $user ) {
@@ -984,7 +984,7 @@ final class user_switching {
 	/**
 	 * Returns the nonce-secured URL needed to switch to a given user ID.
 	 *
-	 * @param  WP_User $user The user to be switched to.
+	 * @param WP_User $user The user to be switched to.
 	 * @return string The required URL.
 	 */
 	public static function switch_to_url( WP_User $user ): string {
@@ -998,8 +998,8 @@ final class user_switching {
 	/**
 	 * Returns the nonce-secured URL needed to switch back to the originating user.
 	 *
-	 * @param  WP_User $user The old user.
-	 * @return string        The required URL.
+	 * @param WP_User $user The old user.
+	 * @return string The required URL.
 	 */
 	public static function switch_back_url( WP_User $user ): string {
 		return wp_nonce_url( add_query_arg( [
