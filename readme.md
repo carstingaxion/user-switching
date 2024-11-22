@@ -85,7 +85,7 @@ User Switching should adhere to Web Content Accessibility Guidelines (WCAG) 2.0 
 
 ### Does this plugin work with PHP 8?
 
-Yes, it's actively tested and working up to PHP 8.3.
+Yes, it's actively tested and working up to PHP 8.4.
 
 ### What does "Switch off" mean?
 
