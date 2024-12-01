@@ -197,6 +197,86 @@ final class SwitchingTest extends Test {
 	}
 
 	/**
+	 * @covers \user_switching_clear_olduser_cookie
+	 */
+	public function testOldUserIsClearedWhenLoggingOut(): void {
+		$admin = self::$testers['admin'];
+
+		wp_set_current_user( $admin->ID );
+
+		// Switch user
+		switch_to_user( self::$users['author']->ID, true );
+
+		// Check that we are considered switched
+		$switched = current_user_switched();
+		self::assertInstanceOf( 'WP_User', $switched );
+		self::assertSame( $admin->ID, $switched->ID );
+
+		// Log out
+		wp_logout();
+
+		// Check that we are no longer considered switched
+		$switched = current_user_switched();
+		self::assertFalse( $switched );
+	}
+
+	/**
+	 * @covers \user_switching_clear_olduser_cookie
+	 */
+	public function testOldUserIsClearedWhenLoggingIn(): void {
+		$admin = self::$testers['admin'];
+
+		wp_set_current_user( $admin->ID );
+
+		// Switch user
+		switch_to_user( self::$users['author']->ID, true );
+
+		// Check that we are considered switched
+		$switched = current_user_switched();
+		self::assertInstanceOf( 'WP_User', $switched );
+		self::assertSame( $admin->ID, $switched->ID );
+
+		// Clear the current user
+		wp_set_current_user( 0 );
+
+		// Log in
+		$signed_on = wp_signon( array(
+			'user_login' => self::$users['author']->user_login,
+			'user_password' => 'password',
+		) );
+		self::assertNotWPError( $signed_on );
+
+		// Check that we are no longer considered switched
+		$switched = current_user_switched();
+		self::assertFalse( $switched );
+	}
+
+	/**
+	 * @covers \user_switching_clear_olduser_cookie
+	 * @see https://github.com/johnbillion/user-switching/issues/142
+	 */
+	public function testBrokenWPLoginActionValueIsIgnored(): void {
+		$admin = self::$testers['admin'];
+
+		wp_set_current_user( $admin->ID );
+
+		// Switch user
+		switch_to_user( self::$users['author']->ID, true );
+
+		// Check that we are considered switched
+		$switched = current_user_switched();
+		self::assertInstanceOf( 'WP_User', $switched );
+		self::assertSame( $admin->ID, $switched->ID );
+
+		// ...
+		do_action( 'wp_login', null );
+
+		// Check that we are no longer considered switched
+		$switched = current_user_switched();
+		self::assertFalse( $switched );
+	}
+
+	/**
 	 * @covers \user_switching::current_url
 	 */
 	public function testCurrentUrl(): void {

@@ -62,6 +62,9 @@ abstract class Test extends \Codeception\TestCase\WPTestCase {
 		add_action( 'set_user_switching_cookie', array( $this, 'action_set_user_switching_cookie' ), 10 );
 		add_action( 'set_olduser_cookie',        array( $this, 'action_set_olduser_cookie' ), 10 );
 		add_action( 'clear_olduser_cookie',      array( $this, 'action_clear_olduser_cookie' ) );
+
+		$_COOKIE = [];
+		$this->sessions = [];
 	}
 
 	final public function action_set_auth_cookie(
