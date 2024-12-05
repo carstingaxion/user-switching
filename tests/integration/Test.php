@@ -6,17 +6,17 @@ abstract class Test extends \Codeception\TestCase\WPTestCase {
 	/**
 	 * @var array<string, \WP_User>
 	 */
-	protected static $users = [];
+	protected static array $users = [];
 
 	/**
 	 * @var array<string, \WP_User>
 	 */
-	protected static $testers = [];
+	protected static array $testers = [];
 
 	/**
 	 * @var array<int, string>
 	 */
-	protected $sessions = [];
+	protected array $sessions = [];
 
 	/**
 	 * @return void
@@ -42,10 +42,10 @@ abstract class Test extends \Codeception\TestCase\WPTestCase {
 
 		if ( is_multisite() ) {
 			self::$users['super'] = $factory->user->create_and_get( array(
-				'role' => 'administrator'
+				'role' => 'administrator',
 			) );
 			self::$testers['super'] = $factory->user->create_and_get( array(
-				'role' => 'administrator'
+				'role' => 'administrator',
 			) );
 			grant_super_admin( self::$users['super']->ID );
 			grant_super_admin( self::$testers['super']->ID );

@@ -15,15 +15,9 @@ final class SwitchingTest extends Test {
 	 */
 	private $test_switching_old_user_id;
 
-	/**
-	 * @var int
-	 */
-	private $test_switching_auth_cookie_user_id;
+	private int $test_switching_auth_cookie_user_id;
 
-	/**
-	 * @var bool
-	 */
-	private $test_switching_auth_cookie_remember;
+	private bool $test_switching_auth_cookie_remember;
 
 	public function _before(): void {
 		parent::_before();
@@ -286,10 +280,9 @@ final class SwitchingTest extends Test {
 	}
 
 	/**
-	 * @param int       $user_id
 	 * @param int|false $old_user_id
 	 */
-	public function _action_switch_user( $user_id, $old_user_id ): void {
+	public function _action_switch_user( int $user_id, $old_user_id ): void {
 		$this->test_switching_user_id = $user_id;
 		$this->test_switching_old_user_id = $old_user_id;
 	}
