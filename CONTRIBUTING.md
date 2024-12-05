@@ -80,7 +80,6 @@ These are the steps to take to release a new version of User Switching (for cont
    - `npm run bump:minor` for a minor release (1.2.3 => 1.3.0)
    - `npm run bump:major` for a major release (1.2.3 => 2.0.0)
 1. `git push origin develop`
-1. `git tag x.y.z`
 1. `git push origin --tags`
 1. Enter the changelog into [the release on GitHub](https://github.com/johnbillion/user-switching/releases) and publish it.
 1. Approve the release on [the WordPress.org release management dashboard](https://wordpress.org/plugins/developers/releases/).

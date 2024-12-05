@@ -16,8 +16,8 @@
 	},
 	"scripts": {
 		"icons": "sharp -i .wordpress-org/icon.svg -o .wordpress-org/icon-128x128.png -f png --palette resize 128 128 && sharp -i .wordpress-org/icon.svg -o .wordpress-org/icon-256x256.png -f png --palette resize 256 256",
-		"bump:patch": "bump patch --commit 'Version %s.' user-switching.php package.json readme.md",
-		"bump:minor": "bump minor --commit 'Version %s.' user-switching.php package.json readme.md",
-		"bump:major": "bump major --commit 'Version %s.' user-switching.php package.json readme.md"
+		"bump:patch": "bump patch --commit 'Version %s.' --tag '%s' user-switching.php package.json readme.md",
+		"bump:minor": "bump minor --commit 'Version %s.' --tag '%s' user-switching.php package.json readme.md",
+		"bump:major": "bump major --commit 'Version %s.' --tag '%s' user-switching.php package.json readme.md"
 	}
 }
