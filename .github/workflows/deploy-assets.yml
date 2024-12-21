@@ -6,12 +6,13 @@ on:
     branches:
       - deploy
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   wordpress:
     name: WordPress.org
+    permissions:
+      contents: read
     uses: johnbillion/plugin-infrastructure/.github/workflows/reusable-deploy-assets.yml@trunk
     with:
       node: false

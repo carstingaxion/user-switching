@@ -21,9 +21,13 @@ on:
       - '.github/workflows/nightly-tests.yml'
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   acceptance:
     name: Nightly ${{ matrix.label }}
+    permissions:
+      contents: read
     strategy:
       matrix:
         label:
@@ -37,8 +41,11 @@ jobs:
       wp: 'nightly'
       php: ${{ matrix.php }}
       node: false
+
   integration:
     name: Nightly ${{ matrix.label }}
+    permissions:
+      contents: read
     uses: johnbillion/plugin-infrastructure/.github/workflows/reusable-integration-tests.yml@trunk
     strategy:
       matrix:
