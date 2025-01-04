@@ -16,7 +16,7 @@ jobs:
     uses: johnbillion/plugin-infrastructure/.github/workflows/reusable-deploy-assets.yml@trunk
     with:
       plugin: user-switching
-      readme: readme.md
+      readme: readme.txt
     secrets:
       WPORG_SVN_USERNAME: ${{ secrets.WPORG_SVN_USERNAME }}
       WPORG_SVN_PASSWORD: ${{ secrets.WPORG_SVN_PASSWORD }}
