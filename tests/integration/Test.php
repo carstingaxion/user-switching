@@ -14,11 +14,6 @@ abstract class Test extends \Codeception\TestCase\WPTestCase {
 	protected static array $testers = [];
 
 	/**
-	 * @var array<int, string>
-	 */
-	protected array $sessions = [];
-
-	/**
 	 * @return void
 	 */
 	public static function wpSetUpBeforeClass( \WP_UnitTest_Factory $factory ) {
@@ -64,7 +59,6 @@ abstract class Test extends \Codeception\TestCase\WPTestCase {
 		add_action( 'clear_olduser_cookie',      array( $this, 'action_clear_olduser_cookie' ) );
 
 		$_COOKIE = [];
-		$this->sessions = [];
 	}
 
 	final public function action_set_auth_cookie(
@@ -77,7 +71,6 @@ abstract class Test extends \Codeception\TestCase\WPTestCase {
 	): void {
 		$_COOKIE[ SECURE_AUTH_COOKIE ] = $cookie;
 		$_COOKIE[ AUTH_COOKIE ] = $cookie;
-		$this->sessions[ $user_id ] = $token;
 	}
 
 	final public function action_set_logged_in_cookie( string $cookie ): void {
