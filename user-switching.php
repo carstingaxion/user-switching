@@ -241,13 +241,11 @@ final class user_switching {
 						'user_switched' => 'true',
 					];
 
-					if ( $redirect_to ) {
-						wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
-					} elseif ( ! current_user_can( 'read' ) ) {
-						wp_safe_redirect( add_query_arg( $args, home_url() ), 302, self::$application );
-					} else {
-						wp_safe_redirect( add_query_arg( $args, admin_url() ), 302, self::$application );
+					if ( ! $redirect_to ) {
+						$redirect_to = current_user_can( 'read' ) ? admin_url() : home_url();
 					}
+
+					wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
 					exit;
 				} else {
 					wp_die( esc_html__( 'Could not switch users.', 'user-switching' ), 404 );
@@ -274,7 +272,6 @@ final class user_switching {
 
 				// Switch user:
 				if ( switch_to_user( $old_user->ID, self::remember(), false ) ) {
-
 					if ( ! empty( $_REQUEST['interim-login'] ) && function_exists( 'login_header' ) ) {
 						// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 						$GLOBALS['interim_login'] = 'success';
@@ -288,11 +285,11 @@ final class user_switching {
 						'switched_back' => 'true',
 					];
 
-					if ( $redirect_to ) {
-						wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
-					} else {
-						wp_safe_redirect( add_query_arg( $args, admin_url( 'users.php' ) ), 302, self::$application );
+					if ( ! $redirect_to ) {
+						$redirect_to = admin_url( 'users.php' );
 					}
+
+					wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
 					exit;
 				} else {
 					wp_die( esc_html__( 'Could not switch users.', 'user-switching' ), 404 );
@@ -319,11 +316,11 @@ final class user_switching {
 						'switched_off' => 'true',
 					];
 
-					if ( $redirect_to ) {
-						wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
-					} else {
-						wp_safe_redirect( add_query_arg( $args, home_url() ), 302, self::$application );
+					if ( ! $redirect_to ) {
+						$redirect_to = home_url();
 					}
+
+					wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
 					exit;
 				} else {
 					/* Translators: "switch off" means to temporarily log out */
