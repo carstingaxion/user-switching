@@ -10,10 +10,12 @@
  *
  * Plugin Name:       User Switching
  * Description:       Instant switching between user accounts in WordPress
- * Version:           1.8.0
+ * Version:           1.9.1
  * Plugin URI:        https://wordpress.org/plugins/user-switching/
  * Author:            John Blackbourn
  * Author URI:        https://johnblackbourn.com
+ * Text Domain:       user-switching
+ * Domain Path:       /languages/
  * Network:           true
  * Requires at least: 5.9
  * Requires PHP:      7.4
@@ -63,8 +65,8 @@ final class user_switching {
 		add_action( 'plugins_loaded', [ $this, 'action_plugins_loaded' ], 1 );
 		add_action( 'init', [ $this, 'action_init' ] );
 		add_action( 'all_admin_notices', [ $this, 'action_admin_notices' ], 1 );
-		add_action( 'wp_logout', 'user_switching_clear_olduser_cookie' );
-		add_action( 'wp_login', 'user_switching_clear_olduser_cookie' );
+		add_action( 'wp_logout', 'user_switching_clear_olduser_cookie', 10, 0 );
+		add_action( 'wp_login', 'user_switching_clear_olduser_cookie', 10, 0 );
 
 		// Nice-to-haves:
 		add_filter( 'ms_user_row_actions', [ $this, 'filter_user_row_actions' ], 10, 2 );
@@ -131,7 +133,7 @@ final class user_switching {
 				<?php echo esc_html_x( 'User Switching', 'User Switching title on user profile screen', 'user-switching' ); ?>
 			</th>
 			<td>
-				<a id="user_switching_switcher" href="<?php echo esc_url( $link ); ?>">
+				<a id="user_switching_switcher" class="button" href="<?php echo esc_url( $link ); ?>">
 					<?php esc_html_e( 'Switch&nbsp;To', 'user-switching' ); ?>
 				</a>
 			</td>
@@ -161,14 +163,14 @@ final class user_switching {
 	}
 
 	/**
-	 * Routes actions depending on the 'action' query var.
+	 * Loads localisation files and routes actions depending on the 'action' query var.
 	 */
 	public function action_init(): void {
+		load_plugin_textdomain( 'user-switching', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
 		if ( ! isset( $_REQUEST['action'] ) ) {
 			return;
 		}
-
-		$current_user = ( is_user_logged_in() ) ? wp_get_current_user() : null;
 
 		switch ( $_REQUEST['action'] ) {
 
@@ -184,15 +186,16 @@ final class user_switching {
 				// Check intent:
 				check_admin_referer( "switch_to_user_{$user_id}" );
 
+				$current_user = wp_get_current_user();
 				$target = get_userdata( $user_id );
 
 				if ( ! $target ) {
 					wp_die( esc_html__( 'Could not switch users.', 'user-switching' ), 404 );
 				}
 
-				$clash = self::detect_session_clash( $target );
+				$duplicate = self::get_duplicated_switch( $target, $current_user );
 
-				if ( $clash && ! isset( $_GET['force_switch_user'] ) ) {
+				if ( $duplicate && ! isset( $_GET['force_switch_user'] ) ) {
 					// Prevent Query Monitor from showing a stack trace for the wp_die() call:
 					// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores
 					do_action( 'qm/cease' );
@@ -200,9 +203,9 @@ final class user_switching {
 					$message = sprintf(
 						/* Translators: 1: The name of the user who is currently switched to the target user, 2: The name of the target user, 3: Period of time (for example "5 minutes") */
 						__( '%1$s is currently switched to %2$s. They switched %3$s ago. Do you want to continue switching?', 'user-switching' ),
-						$clash['user']->display_name,
+						$duplicate['user']->display_name,
 						$target->display_name,
-						human_time_diff( $clash['login'] ),
+						human_time_diff( $duplicate['login'] ),
 					);
 					$yes = sprintf(
 						/* Translators: %s is the name of the target user */
@@ -238,13 +241,11 @@ final class user_switching {
 						'user_switched' => 'true',
 					];
 
-					if ( $redirect_to ) {
-						wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
-					} elseif ( ! current_user_can( 'read' ) ) {
-						wp_safe_redirect( add_query_arg( $args, home_url() ), 302, self::$application );
-					} else {
-						wp_safe_redirect( add_query_arg( $args, admin_url() ), 302, self::$application );
+					if ( ! $redirect_to ) {
+						$redirect_to = current_user_can( 'read' ) ? admin_url() : home_url();
 					}
+
+					wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
 					exit;
 				} else {
 					wp_die( esc_html__( 'Could not switch users.', 'user-switching' ), 404 );
@@ -267,9 +268,10 @@ final class user_switching {
 				// Check intent:
 				check_admin_referer( "switch_to_olduser_{$old_user->ID}" );
 
+				$current_user = wp_get_current_user();
+
 				// Switch user:
 				if ( switch_to_user( $old_user->ID, self::remember(), false ) ) {
-
 					if ( ! empty( $_REQUEST['interim-login'] ) && function_exists( 'login_header' ) ) {
 						// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 						$GLOBALS['interim_login'] = 'success';
@@ -283,11 +285,11 @@ final class user_switching {
 						'switched_back' => 'true',
 					];
 
-					if ( $redirect_to ) {
-						wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
-					} else {
-						wp_safe_redirect( add_query_arg( $args, admin_url( 'users.php' ) ), 302, self::$application );
+					if ( ! $redirect_to ) {
+						$redirect_to = admin_url( 'users.php' );
 					}
+
+					wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
 					exit;
 				} else {
 					wp_die( esc_html__( 'Could not switch users.', 'user-switching' ), 404 );
@@ -297,13 +299,15 @@ final class user_switching {
 			// We're attempting to switch off the current user:
 			case 'switch_off':
 				// Check authentication:
-				if ( ! $current_user || ! current_user_can( 'switch_off' ) ) {
+				if ( ! current_user_can( 'switch_off' ) ) {
 					/* Translators: "switch off" means to temporarily log out */
 					wp_die( esc_html__( 'Could not switch off.', 'user-switching' ), 403 );
 				}
 
+				$current_user = wp_get_current_user();
+
 				// Check intent:
-				check_admin_referer( "switch_off_{$current_user->ID}" );
+				check_admin_referer( 'switch_off' );
 
 				// Switch off:
 				if ( switch_off_user() ) {
@@ -312,11 +316,11 @@ final class user_switching {
 						'switched_off' => 'true',
 					];
 
-					if ( $redirect_to ) {
-						wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
-					} else {
-						wp_safe_redirect( add_query_arg( $args, home_url() ), 302, self::$application );
+					if ( ! $redirect_to ) {
+						$redirect_to = home_url();
 					}
+
+					wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
 					exit;
 				} else {
 					/* Translators: "switch off" means to temporarily log out */
@@ -328,16 +332,24 @@ final class user_switching {
 	}
 
 	/**
-	 * Detects if the target user has any sessions that originated from another user.
+	 * Detects if the target user has any sessions that originated from another user switching into their account.
+	 *
+	 * Returns information about the first such session, if any.
 	 *
 	 * @param WP_User $target Target user.
-	 * @return array|null
+	 * @param WP_User $ignore User to ignore when checking for duplicate switches.
+	 * @return array|null {
+	 *     Information about the duplicate, or null if there is none.
+	 *
+	 *     @type int     $login The login time of the session that originated from another user.
+	 *     @type WP_User $user  The user who switched into the target user's account.
+	 * }
 	 * @phpstan-return array{
 	 *   login: int,
 	 *   user: WP_User,
 	 * }|null
 	 */
-	public static function detect_session_clash( WP_User $target ): ?array {
+	public static function get_duplicated_switch( WP_User $target, WP_User $ignore ): ?array {
 		// Fetch the user sessions for the target user:
 		$sessions = WP_Session_Tokens::get_instance( $target->ID );
 
@@ -345,7 +357,7 @@ final class user_switching {
 		$other_user_sessions = array_filter(
 			$sessions->get_all(),
 			static fn ( array $session ): bool => (
-				isset( $session['switched_from_id'] ) && $session['switched_from_id'] !== $target->ID
+				isset( $session['switched_from_id'] ) && $session['switched_from_id'] !== $ignore->ID
 			)
 		);
 
@@ -623,7 +635,7 @@ final class user_switching {
 		}
 
 		if ( current_user_can( 'switch_off' ) ) {
-			$url = self::switch_off_url( wp_get_current_user() );
+			$url = self::switch_off_url();
 			$redirect_to = is_admin() ? self::get_admin_redirect_to() : [
 				'redirect_to' => rawurlencode( self::current_url() ),
 			];
@@ -962,7 +974,7 @@ final class user_switching {
 	/**
 	 * Returns the switch to or switch back URL for a given user.
 	 *
-	 * @param  WP_User $user The user to be switched to.
+	 * @param WP_User $user The user to be switched to.
 	 * @return string|false The required URL, or false if there's no old user or the user doesn't have the required capability.
 	 */
 	public static function maybe_switch_url( WP_User $user ) {
@@ -980,7 +992,7 @@ final class user_switching {
 	/**
 	 * Returns the nonce-secured URL needed to switch to a given user ID.
 	 *
-	 * @param  WP_User $user The user to be switched to.
+	 * @param WP_User $user The user to be switched to.
 	 * @return string The required URL.
 	 */
 	public static function switch_to_url( WP_User $user ): string {
@@ -994,8 +1006,8 @@ final class user_switching {
 	/**
 	 * Returns the nonce-secured URL needed to switch back to the originating user.
 	 *
-	 * @param  WP_User $user The old user.
-	 * @return string        The required URL.
+	 * @param WP_User $user The old user.
+	 * @return string The required URL.
 	 */
 	public static function switch_back_url( WP_User $user ): string {
 		return wp_nonce_url( add_query_arg( [
@@ -1007,14 +1019,15 @@ final class user_switching {
 	/**
 	 * Returns the nonce-secured URL needed to switch off the current user.
 	 *
-	 * @param  WP_User $user The user to be switched off.
-	 * @return string        The required URL.
+	 * @since 1.9.0 The `$user` parameter has been removed as it's no longer needed.
+	 *
+	 * @return string The required URL.
 	 */
-	public static function switch_off_url( WP_User $user ): string {
+	public static function switch_off_url(): string {
 		return wp_nonce_url( add_query_arg( [
 			'action' => 'switch_off',
 			'nr' => 1,
-		], wp_login_url() ), "switch_off_{$user->ID}" );
+		], wp_login_url() ), 'switch_off' );
 	}
 
 	/**

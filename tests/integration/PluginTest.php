@@ -24,7 +24,7 @@ final class PluginTest extends Test {
 	 */
 	private function get_readme(): ?array {
 		if ( ! isset( $this->readme_data ) ) {
-			$file = dirname( dirname( __DIR__ ) ) . '/readme.md';
+			$file = dirname( dirname( __DIR__ ) ) . '/readme.txt';
 
 			if ( ! is_file( $file ) ) {
 				return null;

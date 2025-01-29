@@ -3,6 +3,7 @@ includes:
 	- vendor/szepeviktor/phpstan-wordpress/extension.neon
 	- vendor/johnbillion/plugin-infrastructure/phpstan/extension.neon
 	- vendor/johnbillion/wp-compat/extension.neon
+	- vendor/swissspidy/phpstan-no-private/rules.neon
 parameters:
 	level: 9
 	paths:
@@ -12,9 +13,6 @@ parameters:
 	scanDirectories:
 		- tests/_support/
 		- vendor/lucatume/wp-browser/src/includes/factory/
-	excludePaths:
-		analyse:
-			- tests/integration/Supports/
 	bootstrapFiles:
 		- tests/phpstan/stubs.php
 	ignoreErrors:
