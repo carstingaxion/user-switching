@@ -13,7 +13,7 @@
 	"devDependencies": {
 		"@johnbillion/plugin-infrastructure": "2.6.0",
 		"@jsdevtools/version-bump-prompt": "^6.1.0",
-		"@playwright/test": "^1.55.0",
+		"@playwright/test": "^1.57.0",
 		"@types/node": "^24.3.0",
 		"sharp-cli": "^4.0.0",
 		"typescript": "^5.9.2"
